@@ -33,6 +33,7 @@ class SeccionController extends Controller
             'area_academica' => ['required', 'string', 'max:100'],
             'duracion_sesion_horas' => ['required', 'numeric', 'min:0', 'max:99.99'],
             'horas_semanales_totales' => ['required', 'numeric', 'min:0', 'max:99.99'],
+            'cantidad_alumnos' => ['nullable', 'integer', 'min:0'],
             'sesiones_por_semana' => ['nullable', 'integer', 'min:1'],
             'activa' => ['nullable', 'boolean'],
         ]);
@@ -69,6 +70,7 @@ class SeccionController extends Controller
             'area_academica' => ['sometimes', 'required', 'string', 'max:100'],
             'duracion_sesion_horas' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99.99'],
             'horas_semanales_totales' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99.99'],
+            'cantidad_alumnos' => ['nullable', 'integer', 'min:0'],
             'sesiones_por_semana' => ['sometimes', 'integer', 'min:1'],
             'activa' => ['sometimes', 'boolean'],
         ]);
