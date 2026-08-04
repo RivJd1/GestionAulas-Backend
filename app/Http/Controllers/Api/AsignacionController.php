@@ -19,6 +19,11 @@ class AsignacionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        \Log::info('Asignacion@store - payload recibido', [
+            'metodo_real' => $request->method(),
+            'body' => $request->all(),
+        ]);
+
         $datos = $request->validate([
             'id_seccion' => [
                 'required', 'integer', 'exists:secciones,id',
@@ -38,7 +43,11 @@ class AsignacionController extends Controller
         $datos['sobrecargo_confirmado'] = $datos['sobrecargo_confirmado'] ?? false;
         $datos['estado'] = $datos['estado'] ?? 'ACTIVA';
 
+        \Log::info('Asignacion@store - datos validados', $datos);
+
         $asignacion = Asignacion::create($datos);
+
+        \Log::info('Asignacion@store - guardado en BD', $asignacion->toArray());
 
         return response()->json([
             'message' => 'Asignación creada correctamente.',
@@ -55,6 +64,12 @@ class AsignacionController extends Controller
 
     public function update(Request $request, Asignacion $asignacion): JsonResponse
     {
+        \Log::info('Asignacion@update - payload recibido', [
+            'id_asignacion' => $asignacion->id,
+            'metodo_real' => $request->method(),
+            'body' => $request->all(),
+        ]);
+
         $datos = $request->validate([
             'id_seccion' => [
                 'sometimes', 'required', 'integer', 'exists:secciones,id',
@@ -73,7 +88,11 @@ class AsignacionController extends Controller
             'estado' => ['sometimes', Rule::in(['ACTIVA', 'ASIGNADA'])],
         ]);
 
+        \Log::info('Asignacion@update - datos validados', $datos);
+
         $asignacion->update($datos);
+
+        \Log::info('Asignacion@update - guardado en BD', $asignacion->toArray());
 
         return response()->json([
             'message' => 'Asignación actualizada correctamente.',

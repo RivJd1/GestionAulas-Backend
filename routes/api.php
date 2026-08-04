@@ -26,3 +26,4 @@ Route::post('asignaciones/{asignacion}', [AsignacionController::class, 'update']
 
 Route::apiResource('periodos-academicos', PeriodoAcademicoController::class);
 Route::apiResource('sesiones-horario', SesionHorarioController::class);
+
