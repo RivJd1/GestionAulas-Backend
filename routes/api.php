@@ -20,8 +20,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('aulas', AulaController::class);
+
+Route::apiResource('aulas', AulaController::class);
     Route::apiResource('secciones', SeccionController::class);
     Route::apiResource('docentes', DocenteController::class);
     Route::apiResource('asignaciones', AsignacionController::class);
@@ -35,4 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('periodos-academicos/{periodo}/activar', [PeriodoAcademicoController::class, 'activate']);
 
     Route::apiResource('sesiones-horario', SesionHorarioController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    
 });

@@ -50,18 +50,22 @@ class SeccionController extends Controller
     }
 
     /**
-     * GET /api/secciones/{seccion}
+     * GET /api/secciones/{id}
      */
-    public function show(Seccion $seccion): JsonResponse
+    public function show($id): JsonResponse
     {
+        $seccion = Seccion::findOrFail($id);
+
         return response()->json($seccion);
     }
 
     /**
-     * PUT/PATCH /api/secciones/{seccion}
+     * PUT/PATCH /api/secciones/{id}
      */
-    public function update(Request $request, Seccion $seccion): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $seccion = Seccion::findOrFail($id);
+
         $datos = $request->validate([
             'materia' => ['sometimes', 'required', 'string', 'max:150'],
             'codigo_materia' => ['nullable', 'string', 'max:30'],
@@ -84,10 +88,11 @@ class SeccionController extends Controller
     }
 
     /**
-     * DELETE /api/secciones/{seccion}
+     * DELETE /api/secciones/{id}
      */
-    public function destroy(Seccion $seccion): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $seccion = Seccion::findOrFail($id);
         $seccion->delete();
 
         return response()->json([
