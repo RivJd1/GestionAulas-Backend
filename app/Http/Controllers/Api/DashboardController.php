@@ -155,7 +155,7 @@ class DashboardController extends Controller
 
                 $descripcion = $a->aula
                     ? ($a->seccion->codigo_materia ?? 'Sección') . ' → ' . $a->aula->nombre
-                        . ($esNueva ? ' asignada' : ' actualizada')
+                    . ($esNueva ? ' asignada' : ' actualizada')
                     : ($a->seccion->codigo_materia ?? 'Sección') . ' quedó sin aula';
 
                 return [

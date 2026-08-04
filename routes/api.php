@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SeccionController;
 use App\Http\Controllers\Api\DocenteController;
 use App\Http\Controllers\Api\AsignacionController;
 use App\Http\Controllers\Api\PeriodoAcademicoController;
+use App\Http\Controllers\Api\DashboardController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -35,6 +36,9 @@ Route::apiResource('aulas', AulaController::class);
     Route::post('periodos-academicos/{periodo}/activar', [PeriodoAcademicoController::class, 'activate']);
 
     Route::apiResource('sesiones-horario', SesionHorarioController::class);
+
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
-    
+
 });
