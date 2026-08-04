@@ -51,22 +51,37 @@ class AulaController extends Controller
     }
 
     /**
-     * GET /api/aulas/{aula}
-     * Muestra una sola aula. Laravel resuelve el {aula} automáticamente
-     * buscando por id gracias a Route Model Binding.
+     * GET /api/aulas/{id}
+     * Muestra una sola aula.
      */
-    public function show(Aula $aula): JsonResponse
+    public function show($id): JsonResponse
     {
+        $aula = Aula::find($id);
+
+        if (! $aula) {
+            return response()->json([
+                'message' => 'El aula que intentas consultar no existe.',
+            ], 404);
+        }
+
         return response()->json($aula);
     }
 
     /**
-     * PUT/PATCH /api/aulas/{aula}
+     * PUT/PATCH /api/aulas/{id}
      * Actualiza una aula. Con "sometimes" acepta actualizaciones parciales:
      * si no envías un campo, no lo exige ni lo toca.
      */
-    public function update(Request $request, Aula $aula): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $aula = Aula::find($id);
+
+        if (! $aula) {
+            return response()->json([
+                'message' => 'El aula que intentas editar no existe.',
+            ], 404);
+        }
+
         $datos = $request->validate([
             'nombre' => [
                 'sometimes', 'required', 'string', 'max:100',
@@ -91,11 +106,19 @@ class AulaController extends Controller
     }
 
     /**
-     * DELETE /api/aulas/{aula}
+     * DELETE /api/aulas/{id}
      * Elimina una aula.
      */
-    public function destroy(Aula $aula): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $aula = Aula::find($id);
+
+        if (! $aula) {
+            return response()->json([
+                'message' => 'El aula que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $aula->delete();
 
         return response()->json([

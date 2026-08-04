@@ -5,7 +5,6 @@ use App\Http\Controllers\Controller;
 use App\Models\PeriodoAcademico;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PeriodoAcademicoController extends Controller
@@ -16,9 +15,7 @@ class PeriodoAcademicoController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(
-            PeriodoAcademico::orderByDesc('created_at')->get()
-        );
+        return response()->json(PeriodoAcademico::all());
     }
 
     /**
@@ -31,11 +28,11 @@ class PeriodoAcademicoController extends Controller
             'nombre' => ['required', 'string', 'max:100', 'unique:periodos_academicos,nombre'],
             'fecha_inicio' => ['required', 'date'],
             'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
-            'estado' => ['nullable', Rule::in(['ACTIVO', 'CERRADO', 'activo', 'cerrado'])],
+            'estado' => ['nullable', Rule::in(['ACTIVO', 'CERRADO'])],
             'id_usuario_creador' => ['required', 'integer', 'exists:users,id'],
         ]);
 
-        $datos['estado'] = strtolower($datos['estado'] ?? 'activo');
+        $datos['estado'] = $datos['estado'] ?? 'ACTIVO';
 
         $periodo = PeriodoAcademico::create($datos);
 
@@ -46,20 +43,36 @@ class PeriodoAcademicoController extends Controller
     }
 
     /**
-     * GET /api/periodos-academicos/{periodo}
+     * GET /api/periodos-academicos/{id}
      * Muestra un solo periodo.
      */
-    public function show(PeriodoAcademico $periodo): JsonResponse
+    public function show($id): JsonResponse
     {
+        $periodo = PeriodoAcademico::find($id);
+
+        if (! $periodo) {
+            return response()->json([
+                'message' => 'El periodo académico que intentas consultar no existe.',
+            ], 404);
+        }
+
         return response()->json($periodo);
     }
 
     /**
-     * PUT/PATCH /api/periodos-academicos/{periodo}
+     * PUT/PATCH /api/periodos-academicos/{id}
      * Actualiza un periodo. Acepta actualizaciones parciales.
      */
-    public function update(Request $request, PeriodoAcademico $periodo): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $periodo = PeriodoAcademico::find($id);
+
+        if (! $periodo) {
+            return response()->json([
+                'message' => 'El periodo académico que intentas editar no existe.',
+            ], 404);
+        }
+
         $datos = $request->validate([
             'nombre' => [
                 'sometimes', 'required', 'string', 'max:100',
@@ -67,88 +80,36 @@ class PeriodoAcademicoController extends Controller
             ],
             'fecha_inicio' => ['sometimes', 'required', 'date'],
             'fecha_fin' => ['sometimes', 'required', 'date', 'after_or_equal:fecha_inicio'],
-            'estado' => ['sometimes', Rule::in(['ACTIVO', 'CERRADO', 'activo', 'cerrado'])],
-            'id_usuario_creador' => ['sometimes', 'required', 'integer', 'exists:users,id'],
+            'estado' => ['sometimes', Rule::in(['ACTIVO', 'CERRADO'])],
+            'id_usuario_creador' => ['sometimes', 'required', 'integer', 'exists:usuarios,id'],
         ]);
 
-        return DB::transaction(function () use ($datos, $periodo): JsonResponse {
-            if (array_key_exists('estado', $datos)) {
-                $estado = strtolower($datos['estado']);
-                $datos['estado'] = $estado;
+        $periodo->update($datos);
 
-                if ($estado === 'activo') {
-                    PeriodoAcademico::query()
-                        ->where('id', '!=', $periodo->id)
-                        ->whereRaw('LOWER(estado) = ?', ['activo'])
-                        ->update(['estado' => 'cerrado']);
-                }
-            }
-
-            $periodo->update($datos);
-
-            return response()->json([
-                'message' => 'Periodo académico actualizado correctamente.',
-                'periodo' => $periodo->refresh(),
-            ]);
-        });
+        return response()->json([
+            'message' => 'Periodo académico actualizado correctamente.',
+            'periodo' => $periodo,
+        ]);
     }
 
     /**
-     * POST /api/periodos-academicos/{periodo}/activar
-     * Activa un periodo y cierra cualquier otro que esté activo.
-     */
-    public function activate(PeriodoAcademico $periodo): JsonResponse
-    {
-        return DB::transaction(function () use ($periodo): JsonResponse {
-            PeriodoAcademico::query()
-                ->where('id', '!=', $periodo->id)
-                ->whereRaw('LOWER(estado) = ?', ['activo'])
-                ->update(['estado' => 'cerrado']);
-
-            $periodo->estado = 'activo';
-            $periodo->save();
-
-            return response()->json([
-                'message' => 'Periodo académico actualizado correctamente.',
-                'periodo' => $periodo->refresh(),
-            ]);
-        });
-    }
-
-    /**
-     * DELETE /api/periodos-academicos/{periodo}
+     * DELETE /api/periodos-academicos/{id}
      * Elimina un periodo.
      */
-    public function destroy(PeriodoAcademico $periodo): JsonResponse
+    public function destroy($id): JsonResponse
     {
-        if (strtolower($periodo->estado) === 'activo') {
+        $periodo = PeriodoAcademico::find($id);
+
+        if (! $periodo) {
             return response()->json([
-                'message' => 'No se puede eliminar un periodo activo.',
-            ], 422);
+                'message' => 'El periodo académico que intentas eliminar no existe.',
+            ], 404);
         }
 
-        return DB::transaction(function () use ($periodo): JsonResponse {
-            $asignacionIds = DB::table('asignaciones')
-                ->where('id_periodo', $periodo->id)
-                ->pluck('id');
+        $periodo->delete();
 
-            if ($asignacionIds->isNotEmpty()) {
-                DB::table('sesiones_horario')
-                    ->whereIn('id_asignacion', $asignacionIds->all())
-                    ->delete();
-
-                DB::table('asignaciones')
-                    ->where('id_periodo', $periodo->id)
-                    ->delete();
-            }
-
-            DB::table('periodos_academicos')
-                ->where('id', $periodo->id)
-                ->delete();
-
-            return response()->json([
-                'message' => 'Periodo académico eliminado correctamente.',
-            ]);
-        });
+        return response()->json([
+            'message' => 'Periodo académico eliminado correctamente.',
+        ]);
     }
 }

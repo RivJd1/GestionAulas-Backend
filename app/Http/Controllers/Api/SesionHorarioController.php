@@ -53,7 +53,13 @@ class SesionHorarioController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $sesionHorario = SesionHorario::findOrFail($id);
+        $sesionHorario = SesionHorario::find($id);
+
+        if (! $sesionHorario) {
+            return response()->json([
+                'message' => 'La sesión de horario que intentas consultar no existe.',
+            ], 404);
+        }
 
         return response()->json($sesionHorario);
     }
@@ -64,7 +70,13 @@ class SesionHorarioController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $sesionHorario = SesionHorario::findOrFail($id);
+        $sesionHorario = SesionHorario::find($id);
+
+        if (! $sesionHorario) {
+            return response()->json([
+                'message' => 'La sesión de horario que intentas editar no existe.',
+            ], 404);
+        }
 
         $datos = $this->validarDatos($request, true);
 
@@ -82,7 +94,14 @@ class SesionHorarioController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $sesionHorario = SesionHorario::findOrFail($id);
+        $sesionHorario = SesionHorario::find($id);
+
+        if (! $sesionHorario) {
+            return response()->json([
+                'message' => 'La sesión de horario que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $sesionHorario->delete();
 
         return response()->json([

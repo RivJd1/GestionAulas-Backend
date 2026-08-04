@@ -57,14 +57,26 @@ class AsignacionController extends Controller
 
     public function show($id): JsonResponse
     {
-        $asignacion = Asignacion::with(['seccion', 'periodo', 'aula', 'docente'])->findOrFail($id);
+        $asignacion = Asignacion::with(['seccion', 'periodo', 'aula', 'docente'])->find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas consultar no existe.',
+            ], 404);
+        }
 
         return response()->json($asignacion);
     }
 
     public function update(Request $request, $id): JsonResponse
     {
-        $asignacion = Asignacion::findOrFail($id);
+        $asignacion = Asignacion::find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas editar no existe.',
+            ], 404);
+        }
 
         \Log::info('Asignacion@update - payload recibido', [
             'id_asignacion' => $asignacion->id,
@@ -104,7 +116,14 @@ class AsignacionController extends Controller
 
     public function destroy($id): JsonResponse
     {
-        $asignacion = Asignacion::findOrFail($id);
+        $asignacion = Asignacion::find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $asignacion->delete();
 
         return response()->json([

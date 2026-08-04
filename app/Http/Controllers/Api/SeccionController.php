@@ -33,7 +33,6 @@ class SeccionController extends Controller
             'area_academica' => ['required', 'string', 'max:100'],
             'duracion_sesion_horas' => ['required', 'numeric', 'min:0', 'max:99.99'],
             'horas_semanales_totales' => ['required', 'numeric', 'min:0', 'max:99.99'],
-            'cantidad_alumnos' => ['nullable', 'integer', 'min:0'],
             'sesiones_por_semana' => ['nullable', 'integer', 'min:1'],
             'activa' => ['nullable', 'boolean'],
         ]);
@@ -54,7 +53,13 @@ class SeccionController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $seccion = Seccion::findOrFail($id);
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas consultar no existe.',
+            ], 404);
+        }
 
         return response()->json($seccion);
     }
@@ -64,7 +69,13 @@ class SeccionController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        $seccion = Seccion::findOrFail($id);
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas editar no existe.',
+            ], 404);
+        }
 
         $datos = $request->validate([
             'materia' => ['sometimes', 'required', 'string', 'max:150'],
@@ -74,7 +85,6 @@ class SeccionController extends Controller
             'area_academica' => ['sometimes', 'required', 'string', 'max:100'],
             'duracion_sesion_horas' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99.99'],
             'horas_semanales_totales' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99.99'],
-            'cantidad_alumnos' => ['nullable', 'integer', 'min:0'],
             'sesiones_por_semana' => ['sometimes', 'integer', 'min:1'],
             'activa' => ['sometimes', 'boolean'],
         ]);
@@ -92,7 +102,14 @@ class SeccionController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        $seccion = Seccion::findOrFail($id);
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $seccion->delete();
 
         return response()->json([
