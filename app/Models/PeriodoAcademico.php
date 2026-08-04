@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,14 @@ class PeriodoAcademico extends Model
         'fecha_inicio' => 'date',
         'fecha_fin' => 'date',
     ];
+
+    protected function estado(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => is_string($value) ? strtolower($value) : $value,
+            set: fn ($value) => is_string($value) ? strtolower($value) : $value,
+        );
+    }
 
     /**
      * El Administrador que creó este periodo.
