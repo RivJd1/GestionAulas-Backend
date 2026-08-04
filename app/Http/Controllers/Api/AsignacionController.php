@@ -55,15 +55,17 @@ class AsignacionController extends Controller
         ], 201);
     }
 
-    public function show(Asignacion $asignacion): JsonResponse
+    public function show($id): JsonResponse
     {
-        return response()->json(
-            $asignacion->load(['seccion', 'periodo', 'aula', 'docente'])
-        );
+        $asignacion = Asignacion::with(['seccion', 'periodo', 'aula', 'docente'])->findOrFail($id);
+
+        return response()->json($asignacion);
     }
 
-    public function update(Request $request, Asignacion $asignacion): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $asignacion = Asignacion::findOrFail($id);
+
         \Log::info('Asignacion@update - payload recibido', [
             'id_asignacion' => $asignacion->id,
             'metodo_real' => $request->method(),
@@ -100,8 +102,9 @@ class AsignacionController extends Controller
         ]);
     }
 
-    public function destroy(Asignacion $asignacion): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $asignacion = Asignacion::findOrFail($id);
         $asignacion->delete();
 
         return response()->json([
