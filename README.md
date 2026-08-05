@@ -99,3 +99,23 @@ Credenciales de prueba (contraseña por defecto: `password`):
 |---|---|
 | admin@unicah.edu.hn | Administrador |
 | coordinador@unicah.edu.hn | Coordinador |
+
+
+## Módulos y Entidades del Backend
+
+El backend organiza la estructura de datos para el consumo del Frontend en los siguientes módulos principales:
+
+| Módulo | Descripción | Tablas Relacionadas |
+|---|---|---|
+| **Asignaciones** | Gestión de aulas, docentes y horarios por periodo | `asignaciones`, `sesiones_horario` |
+| **Catálogos Base** | Registro de recursos permanentes | `aulas`, `docentes`, `secciones` |
+| **Periodos Académicos** | Control de semestres y periodos activos | `periodos_academicos` |
+
+## Mantenimiento y Solución de Problemas
+
+Si realizas cambios en el archivo `.env` o en las rutas de la API y el backend no los detecta inmediatamente, ejecuta los siguientes comandos para limpiar la caché de Laravel:
+
+```bash
+php artisan config:clear
+php artisan route:clear
+php artisan cache:clear
