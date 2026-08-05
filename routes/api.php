@@ -27,12 +27,15 @@ Route::apiResource('aulas', AulaController::class);
     Route::apiResource('docentes', DocenteController::class);
     Route::apiResource('asignaciones', AsignacionController::class);
     Route::post('asignaciones/{asignacion}', [AsignacionController::class, 'update']);
+
     Route::get('periodos-academicos', [PeriodoAcademicoController::class, 'index']);
     Route::post('periodos-academicos', [PeriodoAcademicoController::class, 'store']);
     Route::get('periodos-academicos/{periodo}', [PeriodoAcademicoController::class, 'show']);
     Route::match(['put', 'patch'], 'periodos-academicos/{periodo}', [PeriodoAcademicoController::class, 'update']);
     Route::delete('periodos-academicos/{periodo}', [PeriodoAcademicoController::class, 'destroy']);
     Route::post('periodos-academicos/{periodo}/activar', [PeriodoAcademicoController::class, 'activate']);
+    Route::apiResource('periodos-academicos', PeriodoAcademicoController::class);
+
     Route::apiResource('sesiones-horario', SesionHorarioController::class);
 
 

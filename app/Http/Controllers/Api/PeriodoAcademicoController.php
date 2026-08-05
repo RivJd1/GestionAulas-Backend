@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PeriodoAcademico;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PeriodoAcademicoController extends Controller
@@ -90,6 +91,36 @@ class PeriodoAcademicoController extends Controller
             'message' => 'Periodo académico actualizado correctamente.',
             'periodo' => $periodo,
         ]);
+    }
+
+    /**
+     * POST /api/periodos-academicos/{id}/activar
+     * Activa un periodo y cierra cualquier otro que esté activo.
+     */
+    public function activate($id): JsonResponse
+    {
+        $periodo = PeriodoAcademico::find($id);
+
+        if (! $periodo) {
+            return response()->json([
+                'message' => 'El periodo académico que intentas activar no existe.',
+            ], 404);
+        }
+
+        return DB::transaction(function () use ($periodo): JsonResponse {
+            PeriodoAcademico::query()
+                ->where('id', '!=', $periodo->id)
+                ->where('estado', 'ACTIVO')
+                ->update(['estado' => 'CERRADO']);
+
+            $periodo->estado = 'ACTIVO';
+            $periodo->save();
+
+            return response()->json([
+                'message' => 'Periodo académico activado correctamente.',
+                'periodo' => $periodo->refresh(),
+            ]);
+        });
     }
 
     /**
