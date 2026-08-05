@@ -11,15 +11,12 @@ class Seccion extends Model
 {
     use HasFactory;
 
-    // Laravel pluralizaría "seccion" como "seccions" (regla en inglés),
-    // por eso se fija la tabla explícitamente.
     protected $table = 'secciones';
 
     protected $fillable = [
         'materia',
         'codigo_materia',
         'id_docente',
-        // Turno (matutino/vespertino), no tipo de clase.
         'tipo_sesion',
         'area_academica',
         'duracion_sesion_horas',
