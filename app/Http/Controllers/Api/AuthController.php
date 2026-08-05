@@ -34,6 +34,8 @@ class AuthController extends Controller
             ], 403);
         }
 
+        $token = $user->createToken('api-token')->plainTextToken;
+
         return response()->json([
             'message' => 'Inicio de sesión exitoso.',
             'user' => [
@@ -42,11 +44,14 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'rol' => $user->rol,
             ],
+            'token' => $token,
         ]);
     }
 
     public function logout(Request $request): JsonResponse
     {
+        $request->user()->currentAccessToken()->delete();
+
         return response()->json([
             'message' => 'Sesión cerrada.',
         ]);
@@ -54,7 +59,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json(['message' => 'No autenticado.'], 401);
+        return response()->json($request->user());
     }
 
     public function forgotPassword(Request $request): JsonResponse

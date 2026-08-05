@@ -44,20 +44,36 @@ class DocenteController extends Controller
     }
 
     /**
-     * GET /api/docentes/{docente}
+     * GET /api/docentes/{id}
      * Muestra un solo docente.
      */
-    public function show(Docente $docente): JsonResponse
+    public function show($id): JsonResponse
     {
+        $docente = Docente::find($id);
+
+        if (! $docente) {
+            return response()->json([
+                'message' => 'El docente que intentas consultar no existe.',
+            ], 404);
+        }
+
         return response()->json($docente);
     }
 
     /**
-     * PUT/PATCH /api/docentes/{docente}
+     * PUT/PATCH /api/docentes/{id}
      * Actualiza un docente. Acepta actualizaciones parciales.
      */
-    public function update(Request $request, Docente $docente): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $docente = Docente::find($id);
+
+        if (! $docente) {
+            return response()->json([
+                'message' => 'El docente que intentas editar no existe.',
+            ], 404);
+        }
+
         $datos = $request->validate([
             'nombre_completo' => ['sometimes', 'required', 'string', 'max:150'],
             'correo_institucional' => [
@@ -79,11 +95,19 @@ class DocenteController extends Controller
     }
 
     /**
-     * DELETE /api/docentes/{docente}
+     * DELETE /api/docentes/{id}
      * Elimina un docente.
      */
-    public function destroy(Docente $docente): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $docente = Docente::find($id);
+
+        if (! $docente) {
+            return response()->json([
+                'message' => 'El docente que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $docente->delete();
 
         return response()->json([

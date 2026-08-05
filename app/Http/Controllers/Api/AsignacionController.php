@@ -19,6 +19,11 @@ class AsignacionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        \Log::info('Asignacion@store - payload recibido', [
+            'metodo_real' => $request->method(),
+            'body' => $request->all(),
+        ]);
+
         $datos = $request->validate([
             'id_seccion' => [
                 'required', 'integer', 'exists:secciones,id',
@@ -38,7 +43,11 @@ class AsignacionController extends Controller
         $datos['sobrecargo_confirmado'] = $datos['sobrecargo_confirmado'] ?? false;
         $datos['estado'] = $datos['estado'] ?? 'ACTIVA';
 
+        \Log::info('Asignacion@store - datos validados', $datos);
+
         $asignacion = Asignacion::create($datos);
+
+        \Log::info('Asignacion@store - guardado en BD', $asignacion->toArray());
 
         return response()->json([
             'message' => 'Asignación creada correctamente.',
@@ -46,15 +55,35 @@ class AsignacionController extends Controller
         ], 201);
     }
 
-    public function show(Asignacion $asignacion): JsonResponse
+    public function show($id): JsonResponse
     {
-        return response()->json(
-            $asignacion->load(['seccion', 'periodo', 'aula', 'docente'])
-        );
+        $asignacion = Asignacion::with(['seccion', 'periodo', 'aula', 'docente'])->find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas consultar no existe.',
+            ], 404);
+        }
+
+        return response()->json($asignacion);
     }
 
-    public function update(Request $request, Asignacion $asignacion): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $asignacion = Asignacion::find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas editar no existe.',
+            ], 404);
+        }
+
+        \Log::info('Asignacion@update - payload recibido', [
+            'id_asignacion' => $asignacion->id,
+            'metodo_real' => $request->method(),
+            'body' => $request->all(),
+        ]);
+
         $datos = $request->validate([
             'id_seccion' => [
                 'sometimes', 'required', 'integer', 'exists:secciones,id',
@@ -73,7 +102,11 @@ class AsignacionController extends Controller
             'estado' => ['sometimes', Rule::in(['ACTIVA', 'ASIGNADA'])],
         ]);
 
+        \Log::info('Asignacion@update - datos validados', $datos);
+
         $asignacion->update($datos);
+
+        \Log::info('Asignacion@update - guardado en BD', $asignacion->toArray());
 
         return response()->json([
             'message' => 'Asignación actualizada correctamente.',
@@ -81,8 +114,16 @@ class AsignacionController extends Controller
         ]);
     }
 
-    public function destroy(Asignacion $asignacion): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $asignacion = Asignacion::find($id);
+
+        if (! $asignacion) {
+            return response()->json([
+                'message' => 'La asignación que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $asignacion->delete();
 
         return response()->json([

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('area_academica', 100);
             $table->decimal('duracion_sesion_horas', 4, 2);
             $table->decimal('horas_semanales_totales', 4, 2);
+            $table->unsignedInteger('cantidad_alumnos')->nullable();
             $table->unsignedInteger('sesiones_por_semana')->default(1);
             $table->boolean('activa')->default(true);
             $table->timestamps();

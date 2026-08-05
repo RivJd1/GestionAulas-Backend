@@ -49,18 +49,34 @@ class SeccionController extends Controller
     }
 
     /**
-     * GET /api/secciones/{seccion}
+     * GET /api/secciones/{id}
      */
-    public function show(Seccion $seccion): JsonResponse
+    public function show($id): JsonResponse
     {
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas consultar no existe.',
+            ], 404);
+        }
+
         return response()->json($seccion);
     }
 
     /**
-     * PUT/PATCH /api/secciones/{seccion}
+     * PUT/PATCH /api/secciones/{id}
      */
-    public function update(Request $request, Seccion $seccion): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas editar no existe.',
+            ], 404);
+        }
+
         $datos = $request->validate([
             'materia' => ['sometimes', 'required', 'string', 'max:150'],
             'codigo_materia' => ['nullable', 'string', 'max:30'],
@@ -82,10 +98,18 @@ class SeccionController extends Controller
     }
 
     /**
-     * DELETE /api/secciones/{seccion}
+     * DELETE /api/secciones/{id}
      */
-    public function destroy(Seccion $seccion): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $seccion = Seccion::find($id);
+
+        if (! $seccion) {
+            return response()->json([
+                'message' => 'La sección que intentas eliminar no existe.',
+            ], 404);
+        }
+
         $seccion->delete();
 
         return response()->json([
