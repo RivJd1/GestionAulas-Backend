@@ -21,7 +21,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-
+Route::get('aulas/disponibles', [AulaController::class, 'disponibles']);
 Route::apiResource('aulas', AulaController::class);
     Route::apiResource('secciones', SeccionController::class);
     Route::apiResource('docentes', DocenteController::class);
@@ -40,3 +40,4 @@ Route::apiResource('aulas', AulaController::class);
 Route::middleware('auth:sanctum')->group(function () {
 
 });
+ 
