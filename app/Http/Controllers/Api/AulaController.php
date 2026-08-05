@@ -19,6 +19,20 @@ class AulaController extends Controller
     }
 
     /**
+     * GET /api/aulas/disponibles
+     * Lista únicamente las aulas disponibles.
+     */
+    public function disponibles(): JsonResponse
+    {
+        return response()->json(
+            Aula::where('estado', 'disponible')
+                ->orderBy('edificio')
+                ->orderBy('nombre')
+                ->get()
+        );
+    }
+
+    /**
      * POST /api/aulas
      * Crea un aula nueva.
      */
@@ -50,9 +64,11 @@ class AulaController extends Controller
         ], 201);
     }
 
+
     /**
      * GET /api/aulas/{id}
      * Muestra una sola aula.
+
      */
     public function show($id): JsonResponse
     {
