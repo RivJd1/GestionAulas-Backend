@@ -10,12 +10,12 @@ use Illuminate\Validation\Rule;
 
 class SeccionController extends Controller
 {
-
     public function index(): JsonResponse
     {
-        return response()->json(Seccion::with('docente')->orderBy('materia')->get());
-    }
+        $secciones = Seccion::with('docente')->orderBy('materia')->get();
 
+        return response()->json($secciones->map(fn (Seccion $s) => $this->toPayload($s)));
+    }
 
     public function store(Request $request): JsonResponse
     {
@@ -43,16 +43,14 @@ class SeccionController extends Controller
 
         return response()->json([
             'message' => 'Sección creada correctamente.',
-            'seccion' => $seccion,
+            'seccion' => $this->toPayload($seccion),
         ], 201);
     }
 
- 
     public function show(Seccion $seccion): JsonResponse
     {
-        return response()->json($seccion->load('docente'));
+        return response()->json($this->toPayload($seccion));
     }
-
 
     public function update(Request $request, Seccion $seccion): JsonResponse
     {
@@ -77,10 +75,9 @@ class SeccionController extends Controller
 
         return response()->json([
             'message' => 'Sección actualizada correctamente.',
-            'seccion' => $seccion,
+            'seccion' => $this->toPayload($seccion),
         ]);
     }
-
 
     public function destroy(Seccion $seccion): JsonResponse
     {
@@ -89,5 +86,27 @@ class SeccionController extends Controller
         return response()->json([
             'message' => 'Sección eliminada correctamente.',
         ]);
+    }
+
+    private function toPayload(Seccion $seccion): array
+    {
+        $seccion->loadMissing('docente');
+
+        return [
+            'id' => $seccion->id,
+            'materia' => $seccion->materia,
+            'codigo_materia' => $seccion->codigo_materia,
+            'id_docente' => $seccion->id_docente,
+            'docente_nombre' => $seccion->docente?->nombre_completo,
+            'tipo_sesion' => $seccion->tipo_sesion,
+            'area_academica' => $seccion->area_academica,
+            'duracion_sesion_horas' => $seccion->duracion_sesion_horas,
+            'horas_semanales_totales' => $seccion->horas_semanales_totales,
+            'cantidad_alumnos' => $seccion->cantidad_alumnos,
+            'sesiones_por_semana' => $seccion->sesiones_por_semana,
+            'activa' => $seccion->activa,
+            'created_at' => $seccion->created_at,
+            'updated_at' => $seccion->updated_at,
+        ];
     }
 }
