@@ -33,18 +33,21 @@ class Seccion extends Model
         'horas_semanales_totales' => 'decimal:2',
     ];
 
-    /**
-     * Docente titular por defecto de esta sección (opcional: una
-     * sección puede quedar sin titular asignado por ahora).
-     */
+
+    protected $appends = ['docente_nombre'];
+
+    public function getDocenteNombreAttribute(): ?string
+    {
+        return $this->docente?->nombre_completo;
+    }
+
+
     public function docente(): BelongsTo
     {
         return $this->belongsTo(Docente::class, 'id_docente');
     }
 
-    /**
-     * Todas las veces (periodos) en que esta sección se ha impartido.
-     */
+
     public function asignaciones(): HasMany
     {
         return $this->hasMany(Asignacion::class, 'id_seccion');
