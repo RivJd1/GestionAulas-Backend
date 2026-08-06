@@ -33,15 +33,6 @@ class Seccion extends Model
         'horas_semanales_totales' => 'decimal:2',
     ];
 
-
-    protected $appends = ['docente_nombre'];
-
-    public function getDocenteNombreAttribute(): ?string
-    {
-        return $this->docente?->nombre_completo;
-    }
-
-
     public function docente(): BelongsTo
     {
         return $this->belongsTo(Docente::class, 'id_docente');
